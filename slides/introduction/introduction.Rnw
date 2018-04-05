@@ -1,0 +1,878 @@
+\documentclass[12pt]{beamer}
+\usepackage{tikz}
+
+% make it pretty
+\input{../header.tex}
+
+%------------------------------------------------
+
+\title{Introduction}
+\subtitle{Intro 2 Statistical Learning}
+\author{\href{http://www.gastonsanchez.com}{Gaston Sanchez}}
+\institute{\href{https://creativecommons.org/licenses/by-sa/4.0/}{\tt \scriptsize \color{foreground} CC BY-SA 4.0}}
+\date{}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+# smaller font size for chunks
+opts_chunk$set(size = 'footnotesize')
+options(width=87)
+@
+
+% no page number in first slide
+{
+  \setbeamertemplate{footline}{} 
+  \frame{\titlepage} 
+}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{{\lolit An introduction to} 
+\\ {\mdlit Predictive Modeling} \\ {\lit and Statistical Learning}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Statistical Learning Branches}
+
+{\large
+\begin{center}
+ \begin{tabular}{l c c}
+  \hline
+  {\mdlit \textbf{Statistics}} &  & {\lit \textbf{Machine Learning}} \\
+  \hline
+   & \\
+  Predictive   & &  Supervised  \\
+  methods      & &  learning \\
+   & & \\
+  \hline
+   & & \\
+  Descriptive & &  Unsupervised \\
+  methods     & &  learning \\
+   & & \\
+  \hline
+ \end{tabular}
+\end{center}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\ig[width=11cm]{images/four_corners.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{A word of caution}
+
+Sometimes there might not be a clear distinction between supervised and 
+unsupervised learning. Often, a given method mixes both types of approaches.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Data Analysis Cycle \\ (DAC)}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Cycle of Data Anlaysis Projects}
+\begin{center}
+\ig[width=8cm]{images/cycle1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Cycle of Data Anlaysis Projects}
+\begin{center}
+\ig[width=8cm]{images/cycle2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Cycle of Data Anlaysis Projects}
+\begin{center}
+\ig[width=8cm]{images/cycle3.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Cycle of Data Anlaysis Projects}
+\begin{center}
+\ig[width=8cm]{images/cycle4.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\ig[width=11cm]{images/data-by-the-numbers.png}
+
+{\tiny \url{http://www.phdcomics.com/comics/archive.php/archive/tellafriend.php?comicid=462}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Data Preparation}
+\begin{center}
+\ig[width=4cm]{images/databynumbers1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Core Data Analysis}
+\begin{center}
+\ig[width=4cm]{images/databynumbers2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Reporting}
+\begin{center}
+\ig[width=4cm]{images/databynumbers3.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Communication}
+\begin{center}
+\ig[width=4cm]{images/databynumbers4.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Keep in mind}
+\begin{center}
+\ig[width=11cm]{images/dac0.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{(Some) Major Data Analysis Tasks}
+
+\bbi
+  \item \textbf{Visualization}: to facilitate human discovery
+  \item \textbf{Summarizing}: describing information
+  \item \textbf{Deviation Detection}: finding changes
+  \item \textbf{Profiling}: finding relevant characteristics of a group of individuals
+  \item \textbf{Associations}: finding relationships, e.g. A \& B \& C occur frequently
+  \item \textbf{Clustering}: finding groups in data
+  \pause
+  \item {\large \hilit \textbf{Prediction}}
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Keep in mind}
+\begin{center}
+\ig[width=11cm]{images/dac1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Keep in mind}
+\begin{center}
+\ig[width=11cm]{images/dac2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Official Title}
+\begin{center}
+\Huge{\hilit Modern Statistical Prediction?}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Modern Statistical Prediction?}
+
+\bbi
+  \item Statistical Prediction is not a new task
+  \item Predictive applications (least squares) date back to 18th-19th century 
+  (Andrien-Marie Legendre -vs- Carl Friedrich Gauss)
+  \item Regression framework originated at the beginning of 20th century
+  (Francis Galton, Karl Pearson, Udny Yule)
+  \item Classification framework originated around the 1930s
+  (Ronald Fisher, P.C. Mahalanobis, B.L. Welch)
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\large \mdlit So where does the ``modern'' part come from?}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Modern Statistical Prediction}
+
+\bb{So where does the ``modern'' part come from?}
+\bbi
+  \item Model concept
+  \item Data Sets
+  \item Fields of Application
+  \item Computing Tools
+  \item Mathematical/Algorithmic Tweaks
+  \item Predictive performance assessment 
+  \item Modeling Pipeline
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Concept of a Model}
+
+\bbi
+  \item Term ``model'' appeared in the 1930s (econometric models).
+  \item The concept of model has not remained static.
+  \item Way of thinking about what a model varies across disciplines.
+  \item Even within the same community, there may be different ideas of ``model''.
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Concept of a Model}
+
+\bbi
+  \item Suppose we observe a response $Y$ 
+  \item We also observe $p$ different predictors, $X_1, X_2, \dots, X_p$
+  \item We assume $Y$ is related with $[X_1, \dots, X_p]$
+  \item The relationship can be written in a general form as \\
+  $$
+  Y = f(X_1, X_2, \dots, X_p) + \epsilon
+  $$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Concept of a Model}
+
+{\large
+$$
+Y = f(X_1, X_2, \dots, X_p) + \epsilon
+$$
+}
+
+\bbi
+  \item $f()$ represents the systematic information---the {\mdlit \textit{signal}}---that 
+  the predictors provide about $Y$
+  \item $\epsilon$ represents an \textit{error} term---the {\mdlit \textit{noise}}---that 
+  is a catch-all for what we miss with the model
+\ei
+
+\begin{center}
+{\lit What kind of $f()$?}
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{What kind of $f()$?}
+
+$$
+Y = f(X_1, X_2, \dots, X_p) + \epsilon
+$$
+
+\bbi
+  \item In ``classic'' statistics, $f()$ takes the form of a function 
+  {\lolit (with parameters to be estimated)}
+  \item Within statistical learning, $f()$ is more open-ended
+  \item It can also take the form of an algorithm
+  \item Sometimes $f()$ is a \textit{black box}
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Data Sets}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{The three V's of Data}
+\begin{center}
+\ig[width=7cm]{images/vol-var-vel.pdf}
+
+{\footnotesize {\lolit (3Vs from conversation with Prof. David Ackerly)}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Modern Statistical Prediction?}
+
+\bb{The three V's}
+\bbi
+  \item \textbf{Volume}: larger data sets with reduced storage cost.
+  \item \textbf{Velocity}: increasing rate at which data is produced/recorded.
+  \item \textbf{Variety}: new types of data, more diverse/complex.
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Volume}
+\begin{center}
+\ig[width=10cm]{images/volume-servers.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Velocity}
+\begin{center}
+\ig[width=10cm]{images/velocity-binary.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variety}
+\begin{center}
+\ig[width=10cm]{images/variety-science.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variety}
+\begin{center}
+\ig[width=10cm]{images/variety-med.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variety}
+\begin{center}
+\ig[width=10cm]{images/variety-noaa.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variety}
+\begin{center}
+\ig[width=10cm]{images/variety-social.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Fields of Application}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fields of Application Example}
+
+For instance, consider the history of PLS Regression \\
+{\scriptsize \lolit (I'll talk about this with more detail when we study PLSR)}
+
+\bi
+  \item Origins in mid-1960s with Herman Wold
+  \item As a side-project Wold deviced a series of algorithms based on Least Squares steps
+  \item First applications in Psychometrics and Econometrics
+  \item Karl Joreskog (Wold's former PhD student) disruption 
+  of Structural Equation Models (1970s)
+  \item Explosion of applications in Education, Sociology, Psychology
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fields of Application Example (cont'd)}
+
+For instance, consider the history of PLS Regression \\
+{\scriptsize \lolit (I'll talk about this with more detail when we study PLSR)}
+
+\bi
+  \item Inspired by Joreskog's work, Wold's refined his framework 
+  \item Extension to multivariate regressions and systems of equations
+  \item Herman Wold's framework poorly acknowledged (for various reasons)
+  \item Applied to chemometrics in late 1970s
+  \item Further adaptations by his son Svante Wold, and Harald Martens
+  \item New regression approach via Partial Least Squares
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Mathematical/Algorithmic Tweaks}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Mathematical/Algorithmic tweaks example}
+
+Multiple Linear Regression
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \epsilon
+$$
+
+In matrix notation
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+\pause
+Predicted model 
+$$
+\mathbf{\hat{y}} = \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X b}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Mathematical/Algorithmic tweaks example}
+
+OLS solution given by minimizing the residual sum of squares:
+$$
+min \quad \sum_{i=1}^{n} \left ( y_i - b_0 - \sum_{j=1}^{p} b_j x_j \right )^2
+$$
+
+in vector-matrix notation:
+$$
+min \quad \| \mathbf{y - Xb} \|^2
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Mathematical/Algorithmic tweaks example}
+
+Assuming that $\mathbf{X}$ is of full column-rank, the OLS solution for
+$$
+\mathbf{\hat{y}} = \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X b}
+$$
+
+is given by:
+$$
+\mathbf{b} = \mathbf{(X^\mathsf{T} X)^{-1} X^{\mathsf{T}} y}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Mathematical/Algorithmic tweaks example}
+
+Potential instability---due to multicollinearity---in the OLS solution affecting
+
+{\Large
+$$
+\mathbf{(X^{\mathsf{T}} X)^{-1}}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Mathematical/Algorithmic tweaks example}
+
+{\mdlit One option}: Find inverse of $\mathbf{(X^{\mathsf{T}} X)}$ by
+looking for an orthogonal basis:
+
+{\Large
+$$
+(\mathbf{X^{\mathsf{T}} X})^{-1} \approx \mathbf{V \Lambda_{*}^{-1} V^\mathsf{T}}
+$$
+}
+
+\pause
+\bigskip
+{\lit Another option}: Modify $\mathbf{(X^{\mathsf{T}} X)^{-1}}$ by
+adding a small constant $k$ to the diagonal entries of $\mathbf{X^{\mathsf{T}} X}$
+before taking the inverse:
+
+{\Large
+$$
+\mathbf{X^{\mathsf{T}} X} + k \mathbf{I}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Concept of ``Predictive Modeling''}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Modeling Goals}
+
+\bb{A statistical model typically aims to}
+Provide a certain comprehension of the data and the mechanism
+that generated them through a parsimonious representation of 
+a random phenomenon.
+\eb
+
+\bb{Sometimes also, a statistical model seeks to}
+Predict new observations with ``good'' accuracy.
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Modeling for what?}
+
+\centerline{\mdlit \Large Goal Tradeoff}
+
+\bigskip
+\centerline{\Large Understanding \quad -vs- \quad Prediction}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Introduction}
+
+\bb{Understanding?}
+Understand could mean a model of a distribution for a random 
+vector but it could also mean a regression model.
+
+\bigskip
+From a classic point of view, a model should be simple, and its 
+parameters should be interpretable in terms of its domain of 
+application (e.g. elasticity, odds-ratio, etc).
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Paradoxes}
+
+\bb{Paradox 1}
+A ``good'' statistical model does not necessarily gives accurate 
+predictions (at an individual level). E.g. risk factors in epidemiology.
+\eb
+
+\pause
+
+\bb{Paradox 2}
+We can predict without understanding
+\bi
+  \item no need for a theory of consumer to predict marketing target
+  \item a model may be just simply an algorithm
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Inference}
+
+\bb{Classic Inferential Statistics}
+Methodology for extracting information from data and expressing 
+the amount of uncertainty in decisions we make.
+\eb
+
+\bi
+  \item Assume distributions for the data
+  \item Inferential aspects
+  \item More theory-based
+  \item More focused on testing hypotheses
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Assessing Predictive Performance}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Model Performance}
+
+\bb{How do we define what a ``good'' model is?}
+\bbi
+  \item A model that fits the data well? \\
+  {\lolit (e.g. minimize resubstitution error)}
+  \item A model with optimal parameters? \\
+  {\lolit (e.g. most likely coefficients)}
+  \item A model that adequately predicts new (unseen) observations? \\
+  {\lolit (e.g. minimize generalization error)}
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Predictive Modeling}
+
+{\Large
+\begin{quotation}
+\noindent The Process of developing a mathematical tool or model that generates an accurate prediction.
+
+\bigskip
+{\small \noindent \textit{Kuhn and Johnson, 2013}}
+
+\end{quotation}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Predictive Modeling}
+
+{\Large 
+\begin{quotation}
+\noindent The art of building and using models that make predictions based on patterns extracted from historical data.
+
+\bigskip
+{\small \noindent \textit{Kelleher et al, 2015}}
+\end{quotation}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Model Performance}
+
+\bbi
+  \item From the predictive modeling standpoint, a ``good'' model is one which gives accurate predictions.
+  \item By \textit{predictions} we mean predictions of new data.
+  \item Therefore we focus on the generalization ability of the model to predict unobserved data
+  \item This involves finding measure(s) of accuracy for predictions.
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\lolit So where does the ``modern'' part come from?}
+
+\Large{\mdlit Modeling Pipeline}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Cycle of DAP and Predictive Modeling}
+
+\bi
+  \item Data collection
+  \item Data preparation (cleansing, formatting, transformations)
+  \bi
+    \item Feature selection
+    \item Feature extraction
+  \ei
+  \item Model Building
+  \bi
+    \item Select modeling techniques
+    \item Select validation approach
+    \item Find optimal model
+  \ei
+  \item Evaluation
+  \item Deployment (decision making)
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Predictive Modeling Process}
+
+\bb{Main Considerations}
+\begin{enumerate}
+  \item What data do you have?
+  \item What do you want to predict about the data?
+  \item What predictive methods/techniques should you use?
+  \item How accurate predictions look like?
+  \item What is the predictive performance?
+  \item Is there overfitting?
+\end{enumerate}
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Predictive Modeling}
+
+{\large 
+\begin{quotation}
+\noindent We think that good data analysis depends not only on clear thinking but also on substantive knowledge. Mere numerology will not do, nor is there a good cookbook.
+
+\bigskip
+{\small \noindent \textit{David Freedman, 1987}}
+\end{quotation}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Terminology (Lebart, 1995)}
+
+\small{
+\begin{center}
+ \begin{tabular}{l l}
+  \hline
+   Statistics & Machine Learning \\
+  \hline
+  Variables & Attributes (fields) \\
+  Individuals (objects, observations) & Instances (records, samples) \\
+  Predictors (independent) & Input \\  
+  Response (dependent) & Output (target) \\
+  Model & Machine \\
+  Coefficients & Weights \\
+  Fit Criteria & Cost function \\
+  Estimation & Learning \\
+  Prediction & Supervised \\
+  Structure & Unsupervised \\
+  \hline
+ \end{tabular}
+\end{center}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bibliography}
+
+{\footnotesize
+\bi
+  \item \textbf{Modern Multivariate Statistical Techniques} by Izenman (2008). Springer.
+  \item \textbf{Applied Predictive Modeling} by Kuhn and Johnson (2013).
+  \item \textbf{Fundamentals for Machine Learning for Predictive Data Analytics} by Kelleher et al (2015).
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}
