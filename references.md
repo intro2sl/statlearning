@@ -1,12 +1,14 @@
 ## Bibliography
 
-- _Cornillon, Matzner-Lober_ (2011) __Regression avec R__. Springer.
+- _Cornillon P-A., Matzner-Lober E._ (2011) __Regression avec R__. Springer.
 
 - _Faraway J._ (2015) __Linear Models with R.__ CRC Press.
 
-- _James G., Witten D., Hastie T., Tibshirani R._ (2013) __An Introduction to Statistical Learning with Applications in R__. Springer. 
+- _Hastie T., Tibshirani R., Friedman J._ (2009) __The Elements of Statistical Learning__. Springer.
 
 - _Izenman J._ (2008) __Modern Multivariate Statistical Techniques__. Springer.
+
+- _James G., Witten D., Hastie T., Tibshirani R._ (2013) __An Introduction to Statistical Learning with Applications in R__. Springer. 
 
 - _Kelleher J.D., Mac Namee B., D'Arcy A._ (2015) __Fundamentals for Machine Learning for Predictive Data Analytics__. The MIT Press.
 
@@ -16,7 +18,7 @@
 
 - _Lebart L._ (1982) __Traitement des donnees statistiques__. Dunod.
 
-- _Lebart L., Piron M., Morineau A. _ (2004) __Statistique Exploratoire Multidimensionnelle__. Dunod.
+- _Lebart L., Piron M., Morineau A._ (2004) __Statistique Exploratoire Multidimensionnelle__. Dunod.
 
 - _Legendre P., Legendre L._ (2012) __Numerical Ecology__. Elsevier.
 
