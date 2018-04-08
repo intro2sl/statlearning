@@ -1,0 +1,873 @@
+\documentclass[12pt]{beamer}
+\usepackage{tikz}
+
+% make it pretty
+\input{../header.tex}
+
+%------------------------------------------------
+
+\title{Multicollinearity Issues in Linear Regression}
+\subtitle{Intro 2 Statistical Learning}
+\author{\href{http://www.gastonsanchez.com}{Gaston Sanchez}}
+\institute{\href{https://creativecommons.org/licenses/by-sa/4.0/}{\tt \scriptsize \color{foreground} CC BY-SA 4.0}}
+\date{}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+# smaller font size for chunks
+opts_chunk$set(size = 'footnotesize')
+options(width=87)
+library(FactoMineR)
+@
+
+% no page number in first slide
+{
+  \setbeamertemplate{footline}{} 
+  \frame{\titlepage} 
+}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{About}
+
+Linear Regression Analysis (via OLS) relies on a series of assumptions 
+that do not always hold. 
+
+\bigskip
+In these slides we focus on problems that arise from multicollinearity
+in the predictors.
+
+\bigskip
+Also in these slides, I'm assuming that all variables (predictors and response)
+are centered (mean = 0)!
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Main Assumptions in Linear Model}
+
+The linear regression model of response $Y$ on predictors 
+$X_1, X_2, \dots, X_p$ takes the form:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \varepsilon
+$$
+
+or in matrix notation: 
+
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
+$$
+
+{\lit What are the main assumptions in this framework?}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Main Assumptions in Linear Regression}
+
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
+$$
+
+\bb{main assumptions}
+\bi
+  \item there is a linear relation between response and predictors
+  \item the structural part of the model is $E(Y|X) = \mathbf{X} \boldsymbol{\beta}$
+  \item $\boldsymbol{\varepsilon}$ is just ``noise'' (no systematic structure): \\
+  $\boldsymbol{\varepsilon} \sim \text{i.i.d.} \hspace{2mm} N(\mathbf{0}, \sigma^2 \mathbf{I})$
+  \item predictors are fairly linearly independent: \\
+  $(\mathbf{X^\mathsf{T} X})$ is invertible
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Things that can fail}
+
+\bbi
+  \item Misspecified model (wrong structural part)
+  \item Nonlinearity relation between response and predictors
+  \item Dependence of errors
+  \item Nonconstant variance of errors
+  \item Lack of normality of errors
+  \item {\hilit \textbf{Collinearity in Predictors}}
+\ei
+
+{\lolit We'll focus on collinearity in predictors}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Introduction}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Linear Regression}
+
+Assuming centered data, the multiple regression model is:
+$$
+Y = \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \varepsilon
+$$
+
+In matrix notation
+{\Large
+$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Least Squares Solution}
+
+The OLS solution is given by:
+{\large
+$$
+\mathbf{\hat{y}} = \mathbf{X} \boldsymbol{\hat{\beta}} = \mathbf{X b}
+$$
+}
+
+where:
+{\large
+$$
+\mathbf{b} = \mathbf{(X^{\mathsf{T}} X)^{-1} X^{\mathsf{T}} y}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Let's play with \code{mtcars}}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Data set \code{mtcars}}
+
+First 10 rows:
+<<mtcars, size = 'scriptsize', echo = FALSE, comment = ''>>=
+mtcars[1:10, ]
+@
+
+Let's use \code{mpg} as response, and \code{disp}, \code{hp}, and \code{wt}
+as predictors.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Data set \code{mtcars}}
+
+<<resp_preds>>=
+# response
+mpg <- mtcars$mpg
+
+# predictors
+disp <- mtcars$disp
+hp <- mtcars$hp
+wt <- mtcars$wt
+
+# standardized predictors
+X <- scale(cbind(disp, hp, wt))
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Correlation matrix}
+
+$$
+\mathbf{R} = \frac{1}{n-1} \mathbf{X^\mathsf{T} X}
+$$
+
+<<corr_matrix>>=
+# correlation matrix
+cor(X)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+
+<<pca, echo = FALSE, fig.width=4, fig.height=4, out.width='.8\\linewidth', out.height='.8\\linewidth', fig.align='center'>>=
+pca <- PCA(X, graph = FALSE)
+plot(pca, choix = "var")
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{LS Regression}
+
+<<reg>>=
+# LS regression
+reg <- lm(mpg ~ disp + hp + wt)
+reg
+
+# regression summary
+reg_sum <- summary(reg)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{LS Regression}
+
+<<reg_sum, echo = FALSE, size = 'scriptsize', comment = ''>>=
+reg_sum
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{LS Regression}
+
+Ratio between std errors and coeffs
+<<std_errs_ratio, size = 'footnotesize', comment = ''>>=
+round(reg_sum$coefficients[,2] / reg_sum$coefficients[,1], 4)
+@
+
+\code{disp} has a large standard error compared to its estimate
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Inverse of $\mathbf{(X^\mathsf{T} X)}$}
+
+What about $\mathbf{(X^\mathsf{T} X)^{-1}}$
+
+<<inverse1>>=
+solve(t(X) %*% X)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Multicollinearity Issues}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Multicollinearity}
+
+One of the issues when fitting regression models is due to multicollinearity:
+the condition that arises when two or more predictors are highly correlated.
+
+\bigskip
+{\lit How does this affect OLS regression?}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Exact Collinearity}
+
+When one or more predictors are linear combinations of other predictors, then 
+$\mathbf{X^\mathsf{T} X}$ is singular.
+
+\bigskip
+This is known as \textit{exact collinearity}.
+
+\bigskip
+There is no unique LS estimate $\hat{\boldsymbol{\beta}}$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Multicollinearity: Near-exact Collinearity}
+
+A more challenging problem arises when $\mathbf{X^\mathsf{T} X}$ is close to singular 
+but not exactly.
+
+\bigskip
+This is usually referred to as \textit{multicollinearity}
+
+\bigskip
+Multicollinearity leads to imprecise (unstable) estimates $\boldsymbol{\hat{\beta}}$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{What causes multicollinearity?}
+
+\bbi
+  \item One or more predictors are linear combinations of other predictors
+  \item One or more predictors are almost perfect linear combinations of other predictors
+  \item More predictors than observations $p > n$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Exact Collinearity}
+
+Let's introduce exact collinearity
+
+<<collinearity, size = 'footnotesize', comment = ''>>=
+disp1 <- 10 * disp
+
+X1 <- scale(cbind(disp, disp1, hp, wt))
+
+solve(t(X1) %*% X1)
+@
+
+{\lit Ooops!}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+
+<<pca1, echo = FALSE, fig.width=4, fig.height=4, out.width='.8\\linewidth', out.height='.8\\linewidth', fig.align='center'>>=
+pca1 <- PCA(X1, graph = FALSE)
+plot(pca1, choix = "var")
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Near-exact Collinearity}
+
+Let's introduce near-exact collinearity
+
+<<near_collinearity, size = 'footnotesize', comment = ''>>=
+set.seed(123)
+disp2 <- disp + rnorm(length(disp))
+
+X2 <- scale(cbind(disp, disp2, hp, wt))
+
+solve(t(X2) %*% X2)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+
+<<pca2, echo = FALSE, fig.width=4, fig.height=4, out.width='.8\\linewidth', out.height='.8\\linewidth', fig.align='center'>>=
+pca2 <- PCA(X2, graph = FALSE)
+plot(pca2, choix = "var")
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Near-exact Collinearity}
+
+What about $X_j$ and $X_{j}^{2}$?
+
+<<sqr_predictor, size = 'footnotesize', comment = ''>>=
+disp_sqr <- disp^2
+
+Xsqr <- scale(cbind(disp, disp_sqr, hp, wt))
+
+solve(t(Xsqr) %*% Xsqr)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+
+<<pca3, echo = FALSE, fig.width=4, fig.height=4, out.width='.8\\linewidth', out.height='.8\\linewidth', fig.align='center'>>=
+pca3 <- PCA(Xsqr, graph = FALSE)
+plot(pca3, choix = "var")
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Multicollinearity}
+
+Let's examine correlations of \code{disp} and cousins
+
+<<disp_corrs, size = 'footnotesize', comment = ''>>=
+cor(cbind(disp, disp_sqr, hp, wt))
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Multicollinearity Issues}
+
+<<X2_sqr_inverses, size = 'footnotesize', comment = ''>>=
+solve(t(X2) %*% X2)
+
+solve(t(Xsqr) %*% Xsqr)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\mdlit{Let's make it \\ more extreme!}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Extreme Multicollinearity}
+
+<<corr_multicollinearity, size = 'footnotesize', comment = ''>>=
+set.seed(123)
+disp3 <- disp + rnorm(length(disp), mean = 0, sd = 0.1)
+
+X3 <- scale(cbind(disp, disp3, hp, wt))
+
+cor(disp, disp3)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Multicollinearity Issues}
+
+<<small_change, size = 'footnotesize', comment = ''>>=
+# small changes may have a "butterfly" effect
+disp31 <- disp3
+
+# change just one observation
+disp31[1] <- disp3[1] * 1.01
+
+X31 <- scale(cbind(disp, disp31, hp, wt))
+
+cor(disp, disp31)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Multicollinearity Issues}
+
+<<X3_sqr_inverses, size = 'footnotesize', comment = ''>>=
+solve(t(X3) %*% X3)
+
+solve(t(X31) %*% X31)
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Variance of Coefficients \\ and Multicollinearity}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variance-Covariance matrix $Var(\mathbf{\boldsymbol{\hat{\beta}}})$}
+
+$$
+Var(\mathbf{\boldsymbol{\hat{\beta}}}) = 
+\
+\begin{bmatrix} 
+Var(\hat{\beta}_1) & Cov(\hat{\beta}_1, \hat{\beta}_2) & \cdots & Cov(\hat{\beta}_1, \hat{\beta}_p) \\
+Cov(\hat{\beta}_2, \hat{\beta}_1) & Var(\hat{\beta}_2) & \cdots & Cov(\hat{\beta}_2, \hat{\beta}_p) \\
+\vdots &  & \ddots & \vdots \\
+Cov(\hat{\beta}_p, \hat{\beta}_1) & Cov(\hat{\beta}_p, \hat{\beta}_2) & \cdots & Var(\hat{\beta}_p) \\
+\end{bmatrix}
+$$
+
+$$
+Var(\mathbf{\boldsymbol{\hat{\beta}}}) = \sigma^2 (\mathbf{X^\mathsf{T} X})^{-1}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variance of Estimates}
+
+The variance-Covariance matrix $Var(\mathbf{\boldsymbol{\hat{\beta}}})$ is:
+$$
+Var(\boldsymbol{\hat{\beta}}) = \sigma^2 (\mathbf{X^\mathsf{T} X})^{-1}
+$$
+
+\bigskip
+The variance of a particular coefficient $\hat{\beta}_j$ is given by:
+$$
+Var(\hat{\beta}_j) = \sigma^2 \left [ (\mathbf{X^\mathsf{T} X})^{-1} \right ]_{jj} 
+$$
+
+where $\left [ (\mathbf{X^\mathsf{T} X})^{-1} \right ]_{jj}$ is the $j$-th diagonal element
+of $(\mathbf{X^\mathsf{T} X})^{-1}$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variance of Estimates}
+
+\bbi
+  \item Recall again that we don't know $\sigma^2$. How can we find an estimator 
+  $\hat{\sigma}^2$?
+  \item We don't observe the error terms $\boldsymbol{\varepsilon}$ but we do have
+  the residuals $\mathbf{e = y - \hat{y}}$
+  \item As well as the Residual Sum of Squares (RSS)
+  $$
+  \text{RSS} = \sum_{i=1}^{n} e_{i}^{2} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+  $$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Unbiased Estimate of $\sigma^2$}
+
+To estimate $\sigma^2$ we use:
+$$
+\hat{\sigma}^2 = \frac{\text{RSS}}{n-p-1} = \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{n-p-1} = s^2
+$$
+
+The square root $\hat{\sigma} = \sqrt{\frac{\text{RSS}}{n-p-1}}$ is also known as the \\
+\textbf{Residual Standard Error} {\lolit (reported by most software)}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variance Inflation Factor (VIF)}
+
+Assuming standardized variables, $\mathbf{X^\mathsf{T} X} = n \mathbf{R}$
+
+It can be shown that 
+$$
+Var(\boldsymbol{\hat{\beta}}) = \sigma^2 \left ( \frac{\mathbf{R}^{-1}}{n} \right )
+$$
+
+and $Var(\hat{\beta}_j)$ can then be expressed as:
+$$
+Var(\hat{\beta}_j) = \frac{\sigma^2}{n} [\mathbf{R}^{-1}]_{jj}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Variance Inflation Factor (VIF)}
+
+$$
+Var(\hat{\beta}_j) = \frac{\sigma^2}{n} [\mathbf{R}^{-1}]_{jj}
+$$
+
+It turns out that:
+$$
+[\mathbf{R}^{-1}]_{jj} = \frac{1}{1 - R_{j}^{2}}
+$$
+is known as the \textbf{Variance Inflation Factor} or VIF
+
+\bigskip
+If $R_{j}^{2}$ is close to 1, then VIF will be large, and so $Var(\hat{\beta})$ will also be large.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Role of eigenvalues of matrix $\mathbf{R}$}
+
+If we write the eigenvalue decomposition of $\mathbf{R}$ as:
+{\large
+$$
+\mathbf{R = V \boldsymbol{\Lambda} V^\mathsf{T}}
+$$
+}
+
+\pause
+then the inverse of $\mathbf{R}$ becomes:
+{\large
+$$
+\mathbf{R^{-1} = V \boldsymbol{\Lambda}^{-1} V^\mathsf{T}}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Role of eigenvalues of matrix $\mathbf{R}$}
+
+It can be shown that 
+$$
+Var(\hat{\beta}_j) = \left ( \frac{\sigma^2}{n} \right )  \sum_{l=1}^{p} \frac{v^{2}_{jl}}{\lambda_l}
+$$
+
+As you can tell, the variance of the estimators depends on the inverses of the
+eigenvalues of $\mathbf{R}$
+
+\bigskip
+With very small eigenvalues, the larger the variance of the estimates.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Summary}
+
+\bb{With multicollinearity ...}
+\bbi
+  \item the standard errors of $\hat{\beta}_j$ are inflated.
+  \item the fit is unstable, and becomes very sensitive to small perturbations.
+  \item small changes in $Y$ can lead to large changes in the coefficients.
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{How to detect \\ Multicollinearity?}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{How to detect Collinearity?}
+
+\bbi
+  \item Examine correlation matrix of predictors
+  \item Check \textit{multiple correlation} coefficients $R_{j}^{2}$ \\
+  {\small {\lolit $R_{j}^{2}$ is the coeff of determination when regressing $X_j$ on all other predictors}}
+  \item Examine eigenvalues of $\mathbf{X^\mathsf{T} X}$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Detecting collinearity pairwise correlations}
+
+Perhaps the most basic approach to start checking whether there is multicollinearity
+is to examine the (population) correlation matrix of predictors
+
+{\Large
+$$
+\mathbf{R} = \frac{1}{n} \mathbf{X^\mathsf{T} X}
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Detecting collinearity pairwise correlations}
+
+\bb{Examining the correlation matrix}
+\bbi
+  \item Examining the correlation matrix of predictors
+  \item Correlation values close to $-1$ or $+1$ indicate large 
+  \textbf{pairwise} collinearities.
+  \item However, there may be small correlations from highly correlated variables.
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Detecting collinearity with $R_{j}^{2}$ coefficients}
+
+\bb{Multiple correlation coefficients}
+\bbi
+  \item Another way to check for collinearity is to calculate multiple correlation 
+  coefficients $R_{j}^{2}$ for each predictor.
+  \item Regress $X_j$ on all other predictors $X_h$ ($h \neq j$).
+  \item If $R_{j}^{2}$ is close to one, it means that this predictor can almost be predicted
+  exactly by a linear combination of other predictors.
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Detecting collinearity with Eigenvalues}
+
+\bb{Eigenvalues}
+\bbi
+  \item A third approch is to examine the eigenvalues of $\mathbf{X^\mathsf{T} X}$
+  \item Eigenvalues equal to zero denote exact collinearity
+  \item Small eigenvalues (close to zero) indicate multicollinearity. But how small?
+\ei
+\eb
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Detecting collinearity with Eigenvalues}
+
+When there are ``small'' non-zero eigenvalues, some authors propose to use the 
+\textbf{condition number} $\kappa$
+$$
+\kappa = \sqrt{\frac{\lambda_{max}}{\lambda_{min}}}
+$$
+
+where $\lambda_{max}$ and $\lambda_{min}$ are the largest and smallest eigenvalues, 
+respectively, of $\mathbf{X^\mathsf{T} X}$.
+
+\bigskip
+As a rule of thumb, a condition number $\kappa \geq 30$ is used to indicate multicollinearity.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Think about it}
+
+{\Large 
+\begin{quotation}
+\mdlit \noindent What would you do to overcome multicollinearity?
+\end{quotation}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Some suggestions}
+
+\bbi
+  \item Reduce number of predictors
+  \item If $p > n$, then try to get more observations (increase $n$)
+  \item Find an orthogonal basis for the predictors
+  \item Impose constraints on the estimated coefficients
+  \item A mix of some or all of the above?
+  \item \textit{Other ideas?}
+\ei
+
+{\lolit We'll study all of these proposals}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bibliography}
+
+{\footnotesize
+\bi
+  \item \textbf{The Elements of Statistical Learning} by Hastie et al (2009). Springer.
+  \item \textbf{Linear Models with R} by Julian Faraway (2015). CRC Press.
+  \item \textbf{Modern Regression Methods} by Thomas Ryan (1997). Wiley.
+  \item \textbf{Modern Multivariate Statistical Techniques} by Julian Izenman (2008). Springer.
+  \item \textbf{Data Mining and Statistics for Decision Making} by Stephane Tuffery (2011).
+  \textit{Chapter 11: Classification and prediction methods}. Wiley.
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{French Literature}
+
+{\footnotesize
+\bi
+  \item \textbf{Probabilites, analyse des donnees et statistique} by Gilbert Saporta (2011).
+  \textit{Chapter 17: La regression multiple et le modele lineaire general}. 
+  Editions Technip, Paris.
+  \item \textbf{Statistique: Methodes pour decrire, expliquer et prevoir} 
+  by Michel Tenenhaus (2008). \textit{Chapter 5: La Regression Multiple}. Dunod, Paris.
+  \item \textbf{Regression avec R} by Cornillon and Matzner-Lober (2011). Springer.
+  \item \textbf{Statistique Exploratoire Multidimensionnelle} by Lebart et al (2004).
+  \textit{Chapter 3, section 3.2: Regression multiple, modele lineaire}. Dunod, Paris.
+  \item \textbf{Traitement des donnees statistiques} by Lebart et al. (1982). 
+  \textit{Unit 3: Modele Lineaire}. Dunod, Paris.
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}
