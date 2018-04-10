@@ -1,0 +1,676 @@
+\documentclass[12pt]{beamer}
+\usepackage{tikz}
+
+% make it pretty
+\input{../header.tex}
+
+%------------------------------------------------
+
+\title{Bias-Variance Trade-off}
+\subtitle{Intro 2 Statistical Learning}
+\author{\href{http://www.gastonsanchez.com}{Gaston Sanchez}}
+\institute{\href{https://creativecommons.org/licenses/by-sa/4.0/}{\tt \scriptsize \color{foreground} CC BY-SA 4.0}}
+\date{}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+# smaller font size for chunks
+opts_chunk$set(size = 'footnotesize')
+options(width=87)
+@
+
+% no page number in first slide
+{
+  \setbeamertemplate{footline}{} 
+  \frame{\titlepage} 
+}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Bias-Variance Trade-off}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bias-Variance Wikipedia Entry}
+\begin{center}
+\ig[height=5cm]{images/bias-variance-wikipedia.png}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{You should know}
+
+The ``bias-variance decomposition'' is a \textbf{conceptual device} based on
+the (theoretical) expected squared prediction error of an estimated model.
+
+\bigskip
+Keep in mind that this decomposition is of a theoretical nature, and its
+derivation involves assuming a population data set.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Theoretical Considerations}
+
+Suppose we could have an infinite number of independent \textit{training} sets of the same size,
+and we use them to fit an infinite number of models.
+
+\bigskip
+Likewise, suppose we had an ideal \textit{test} set, independent from the training sets, 
+from which we draw an observation $x_0$, and we compute infinite predictions $\hat{f}(x_0)$.
+
+\bigskip
+In this idealized situation, errors will still occur because no learning scheme is perfect:
+\bi
+  \item we have noise in the data (i.e. $\epsilon$)
+  \item not all models will perfectly fit $x_0$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Theoretical Considerations}
+
+A key question of interest is: What is the expected error when predicting $x_0$?
+(i.e. \textit{generalization error} on new data?)
+
+\bigskip
+Using squared-error loss we have:
+
+$$
+\text{Err}(x_0) = E[(Y - \hat{f}(x_0))^2 | X = x_0]
+$$
+
+It can be shown that this expected error can be decomposed in three pieces as:
+
+$$
+\text{Err}(x_0) = \sigma^2 + \text{Bias}^2(\hat{f}(x_0)) + \text{Var}(\hat{f}(x_0))
+$$
+
+{\mdlit This is the so-called \textit{Bias-Variance Decomposition}}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+To explain where the bias-variance decomposition comes from, we need to
+review some basic concepts of statistical estimators.
+
+\bigskip
+The main concept has to do with the Mean Squared Error of an estimator.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Reminder of \\ Statistical Estimation}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Reminder: Estimation}
+
+{\large
+\begin{quotation}
+\noindent Simply put, \textit{estimation} consists of providing an approximate value
+to the parameter of a population, using a (random) sample of observations 
+drawn from such population.
+\end{quotation}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Considerations}
+
+\bbi
+  \item Consider a population for which we want to estimate an unknown value $\theta$
+  {\lolit (i.e. parameter)}
+  \item Say we use an estimator $\hat{\theta}$ based on our sample data.
+  \item Suppose that $\hat{\theta}$ has a finite variance.
+  \item Also, suppose that we know the distribution of $\hat{\theta}$.
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Keep in mind}
+
+\bi
+  \item An estimator is a random variable
+  \item A first sample will result in $\hat{\theta}_1$
+  \item A second sample will result in $\hat{\theta}_2$
+  \item A third sample will result in $\hat{\theta}_3$
+  \item and so on ...
+  \item Some samples will yield a $\hat{\theta}$ that overestimates $\theta$
+  \item Other samples will yield a $\hat{\theta}$ that underestimates $\theta$
+  \item Some samples will yield a $\hat{\theta}$ matching $\theta$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{}
+\begin{center}
+\ig[height=5cm]{images/theta-hat-distribution1.pdf}
+
+How much different---or similar---is $\hat{\theta}$ from $\theta$? \\
+{\lolit i.e. how accurate is $\hat{\theta}$?}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation Error}
+
+A natural question that we can ask is: \\
+{\mdlit \textbf{How different is $\hat{\theta}$ from $\theta$?}}
+
+\bigskip 
+This question involves looking at the difference: $\hat{\theta} - \theta$,
+which is commonly referred to as the \textit{estimation error}:
+
+{\large
+$$
+\text{estimation error} = \hat{\theta} - \theta
+$$
+}
+
+We would like to measure the ``size'' of such difference.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation Error}
+
+Notice that the estimation error is also a random variable:
+\bi
+  \item A first sample will result in an error $\hat{\theta}_1 - \theta$
+  \item A second sample will result in an error $\hat{\theta}_2 - \theta$
+  \item A third sample will result in an error $\hat{\theta}_3 - \theta$
+  \item and so on ...
+\ei
+
+\bigskip
+So how do we measure the ``size'' of the estimation errors?
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+The typical way to quantify the amount of estimation error is by calculating
+the squared errors, and then averaging over all the possible values of the estimators.
+
+\bigskip
+This is known as the \textbf{Mean Squared Error} (MSE) of $\hat{\theta}$:
+
+{\large
+$$
+\text{MSE}(\hat{\theta}) = E \left [ (\hat{\theta} - \theta)^2 \right ]
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+We use the \textbf{Mean Squared Error} to measure the accuracy 
+of an estimator $\hat{\theta}$.
+
+\bigskip
+MSE is the squared distance from our estimator $\hat{\theta}$ to the true value
+$\theta$, averaged over all possible samples.
+
+\bigskip
+It is convenient to regard the estimation error, $\hat{\theta} - \theta$, with respect 
+to $E(\hat{\theta})$ {\lolit (see diagram in next slide)}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{}
+\begin{center}
+\ig[height=6cm]{images/theta-hat-distribution2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+Let's rewrite $(\hat{\theta} - \theta)^2$ as $( \hat{\theta} - E(\hat{\theta}) + E(\hat{\theta}) - \theta)^2$, \\ and let $E(\hat{\theta}) = \mu_{\hat{\theta}}$. Then:
+
+\begin{align*}
+(\hat{\theta} - \theta)^2 &= \left ( \hat{\theta} - E(\hat{\theta}) + E(\hat{\theta}) - \theta \right )^2 \\
+&= ( \hat{\theta} - \mu_{\hat{\theta}} + \mu_{\hat{\theta}} - \theta )^2 \\
+&= (\underbrace{\hat{\theta} - \mu_{\hat{\theta}}}_{a} + \underbrace{\mu_{\hat{\theta}} - \theta}_{b})^2 \\
+&= a^2 + b^2 + 2ab \\
+\Longrightarrow E \left [ (\hat{\theta} - \theta)^2 \right ] &= E[a^2 + b^2 + 2ab]
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+We have that $\text{MSE}(\hat{\theta}) = E[(\hat{\theta} - \theta)^2]$ can be decomposed as:
+
+\begin{align*}
+E \left [ (\hat{\theta} - \theta)^2 \right ] &= E[a^2 + b^2 + 2ab] \\
+&= E(a^2) + E(b^2) + 2E(ab) \\
+&= E [ (\hat{\theta} - \mu_{\hat{\theta}})^2 ] +
+E [ (\mu_{\hat{\theta}} - \theta)^2 ] + 2E(ab)
+\end{align*}
+
+Notice that $E(ab)$:
+$$
+E(ab) = E[ (\hat{\theta} - \mu_{\hat{\theta}}) (\mu_{\hat{\theta}} - \theta) ] = 0
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+\begin{align*}
+\text{MSE}(\hat{\theta}) &= E \left [ (\hat{\theta} - \theta)^2 \right ] \\
+& \\
+&= E [ (\hat{\theta} - \mu_{\hat{\theta}})^2 ] +
+E [ (\mu_{\hat{\theta}} - \theta)^2 ] \\
+& \\
+&= E [(\underbrace{\hat{\theta} - \mu_{\hat{\theta}}}_{\text{Bias}})^2] + 
+\underbrace{E [ (\mu_{\hat{\theta}} - \theta)^2 ]}_{\text{Variance}} \\
+& \\
+&= \text{Bias}^{2} (\hat{\theta}) + \text{Var}(\hat{\theta})
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Summary}
+
+The MSE of an estimator can be decomposed in terms of Bias and Variance.
+
+\bigskip
+\textbf{Bias}, $\hat{\theta} - \mu_{\hat{\theta}}$, is the tendency of $\hat{\theta}$ 
+to overestimate or underestimate $\theta$ over all possible samples.
+
+\bigskip
+\textbf{Variance}, $\text{Var}(\hat{\theta})$, simply measures the average 
+variability of the estimators around their mean $E(\hat{\theta})$.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Representative Scenarios for Bias-Variance}
+\begin{center}
+\ig[height=7cm]{images/bias-variance-targets.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Bias-Variance Decomposition \\ for $\hat{f}(X) - f(X)$}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+In regression models, $\hat{f}(X)$ is an estimator of $f(X)$.
+Thus, we could ask about the mean squared error of $\hat{f}(X)$
+
+$$
+\text{MSE}(\hat{f}(X)) = E [(\hat{f}(X) - f(X))^2]
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+In order to improve readibility, let's represent $\hat{f}(x)$ simply as $\hat{f}$:
+
+\begin{align*}
+(\hat{f} - f)^2 &= (\hat{f} - E(\hat{f}) + E(\hat{f}) - f)^2 \\
+&= (\underbrace{\hat{f} - E(\hat{f})}_{a} + \underbrace{E(\hat{f}) - f}_{b})^2 \\
+&= a^2 + b^2 + 2ab \\
+\Longrightarrow E \left [ (\hat{f} - f)^2 \right ] &= E[a^2 + b^2 + 2ab]
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+We have that $\text{MSE}(\hat{f}) = E[(\hat{f} - f)^2]$ can be decomposed as:
+
+\begin{align*}
+E \left [ (\hat{f} - f)^2 \right ] &= E[a^2 + b^2 + 2ab] \\
+&= E(a^2) + E(b^2) + 2E(ab) \\
+&= E [ (\hat{f} - E(\hat{\theta}))^2 ] +
+E [ (E(\hat{f}) - f)^2 ] + 2E(ab)
+\end{align*}
+
+Notice that $E(ab)$:
+$$
+E(ab) = E[ (\hat{f} - E(\hat{f})) (E(\hat{f}) - f) ] = 0
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{MSE of a Statistical Estimator}
+
+\begin{align*}
+\text{MSE}(\hat{f}) &= E \left [ (\hat{f} - f)^2 \right ] \\
+& \\
+&= E [ (\hat{f} - E(\hat{f}))^2 ] +
+E [ (E(\hat{f}) - f)^2 ] \\
+& \\
+&= E [(\underbrace{\hat{f} - E(\hat{f})}_{\text{Bias}})^2] + 
+\underbrace{E [ (E(\hat{f}) - f)^2 ]}_{\text{Variance}} \\
+& \\
+&= \text{Bias}^{2} (\hat{f}) + \text{Var}(\hat{f})
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Example}
+
+To make things less abstract, let's consider a hypothetical example
+{\lolit (stolen from Norman Matloff, 2017)}
+
+\bbi
+  \item Consider a chain of hospitals.
+  \item They are interested in comparing the quality of care for hear attack patients.
+  \item They want to compare the level of quality of care for different locations.
+  \item Let's see how bias and variance may occur in this case. \\
+  {\lolit \textit{Example discussed in class.}}
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Bias-Variance Decomposition \\ for $Y - \hat{f}(X)$}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+In regression models, we also use $\hat{f}(X)$ to obtain predictions of $Y$,
+assuming the standard conceptual equation: 
+
+$$
+Y = f(X_1, X_2, \dots, X_p) + \varepsilon
+$$
+
+where:
+\bi
+  \item $E(\varepsilon) = 0$
+  \item $Var(\varepsilon) = \sigma^2$
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+Recall that we have two flavors of predictions:
+
+\bigskip
+The training set is formed by observations $(x_i, y_i)$ that are used to train
+the model. And we can calculate a training MSE. This is a measure of resubstition 
+or apparent error.
+
+\bigskip
+The test set is formed by observations $(x_0, y_0)$ that are NOT used to train
+the model. We can calculate a test MSE. This is a measure of generalization 
+or error.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+From a theoretical point of view, one population value (i.e. parameter) 
+that we are interested in estimating is the \textit{test MSE}
+
+$$
+\text{Population Test MSE} = E [(y_0 - \hat{f}(x_0))^2]
+$$
+
+
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+Let's focus on $(y - \hat{f}(x))^2$. In order to improve readibility, let's
+represent $\hat{f}(x)$ simply as $\hat{f}$:
+
+\begin{align*}
+(y - \hat{f}(x))^2 &= (y - \hat{f})^2 \\
+&= (f + \epsilon - \hat{f})^2 \\
+&= (f + \epsilon - E(\hat{f}) + E(\hat{f}) - \hat{f})^2 \\
+&= (\underbrace{f - E(\hat{f}) + \epsilon}_{a} - \underbrace{[\hat{f} - E(\hat{f})]}_{b})^2 \\
+&= a^2 + b^2 - 2ab
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{In Regression Models ...}
+
+Let's see what's going on with: $(y - \hat{f})^2 = a^2 + b^2 - 2ab$
+
+\begin{align*}
+a^2 &= (f - E(\hat{f}))^2 + \epsilon^2 + 2 \epsilon [f - E(\hat{f})] \\
+b^2 &= (\hat{f} - E(\hat{f}))^2 \\
+2ab &= 2 [f - E(\hat{f}) + \epsilon] [\hat{f} - E(\hat{f})]
+\end{align*}
+
+But we need to find the expectations:
+$$
+E [(y - \hat{f})^2] = E(a^2) + E(b^2) - 2E(ab)
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Test MSE}
+
+\begin{align*}
+E(a^2) &= E \left [(f - E(\hat{f}))^2 \right ] + E(\epsilon^2) + 2 E(\epsilon [f - E(\hat{f})]) \\
+E(b^2) &= E \left [(\hat{f} - E(\hat{f}))^2 \right ] \\
+E(2ab) &= 2 E \left ([f - E(\hat{f}) + \epsilon] [\hat{f} - E(\hat{f})] \right )
+\end{align*}
+
+Notice that:
+\begin{align*}
+E(a^2) &= E \left [(f - E(\hat{f}))^2 \right ] + E(\epsilon^2) \\
+E(b^2) &= E \left [(\hat{f} - E(\hat{f}))^2 \right ] \\
+E(2ab) &= 0
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bias-Variance Decomposition}
+
+\begin{align*}
+E [(y - \hat{f})^2] &= E \left [(f - E(\hat{f}))^2 \right ] + E(\epsilon^2) +
+E \left [(\hat{f} - E(\hat{f}))^2 \right ] \\
+& \\
+&= E(\epsilon^2) + E \left [(f - E(\hat{f}))^2 \right ] +
+E \left [(\hat{f} - E(\hat{f}))^2 \right ] \\
+& \\
+&= \sigma^2 + \text{Bias}^2(\hat{f}) + \text{Variance}(\hat{f}) \\
+& \\
+&= \text{Irreducible Error} + \text{Bias}^2 + \text{Variance}
+\end{align*}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bias-Variance Decomposition}
+
+\bbi
+  \item The irreducible error $\sigma^2$ cannot be avoided no matter how well we
+  estimate $f(x)$, unless $\sigma^2 = 0$.
+  \item The squared bias is the amount by which the average of the estimate differs 
+  from the true mean.
+  \item The variance is the expected squared deviation of $\hat{f}(x)$ around its mean.
+  \item Typically, the more complex the model $\hat{f}$, the lower the (squared) bias 
+  but the higher the variance. 
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Large{\mdlit{Bias-Variance Trade-off \\ Examples with Simulated Data}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{A) 3 model estimates and their MSEs}
+\begin{center}
+\ig[width=11cm]{images/three-estimates-flex1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{B) 3 model estimates and their MSEs}
+\begin{center}
+\ig[width=11cm]{images/three-estimates-flex2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{C) 3 model estimates and their MSEs}
+\begin{center}
+\ig[width=11cm]{images/three-estimates-flex3.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\ig[width=10cm]{images/three-estimates-bias-var.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bibliopgraphy}
+
+{\footnotesize
+\bi
+  \item \textbf{Statistical Regression and Classification} by Norman Matloff (2017).
+  CRC Press.
+  \item \textbf{An Introduction to Statistical Learning} by James et al (2013).
+  \textit{Chapter 2: Statistical Learning}. Springer.
+  \item \textbf{Statistical Learning from a Regression Perspective} by Richard Berk (2008). 
+  \textit{Chapter 1: Regression Framework}. Springer.
+  \item \textbf{Data Mining: Practical Machine Learning Tools and Techniques} by Ian Witten and Eibe Frank (2005).
+  Elsevier.
+  \item \textbf{Modern Multivariate Statistical Techniques} by Julian Izenman (2008). 
+  \textit{Chapter 5: Prediction Accuracy and Model Assessment}. Springer.
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}
