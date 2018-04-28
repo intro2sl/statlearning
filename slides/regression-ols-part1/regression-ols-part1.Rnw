@@ -1,0 +1,852 @@
+\documentclass[12pt]{beamer}
+\usepackage{tikz}
+
+% make it pretty
+\input{../header.tex}
+
+%------------------------------------------------
+
+\title{Linear Regression (part 1)}
+\subtitle{Intro 2 Statistical Learning}
+\author{\href{http://www.gastonsanchez.com}{Gaston Sanchez}}
+\institute{\href{https://creativecommons.org/licenses/by-sa/4.0/}{\tt \scriptsize \color{foreground} CC BY-SA 4.0}}
+\date{}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+# smaller font size for chunks
+opts_chunk$set(size = 'footnotesize')
+options(width=87)
+@
+
+% no page number in first slide
+{
+  \setbeamertemplate{footline}{} 
+  \frame{\titlepage} 
+}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Linear Regression}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{\code{Advertising} Data from ISL}
+
+<<eval = FALSE, size = 'scriptsize'>>=
+# file in folder data/ of github repo
+Advertising <- read.csv("data/Advertising.csv", row.names = 1)
+@
+
+<<read_advertising, echo = FALSE, comment = "">>=
+Advertising <- read.csv("../../data/Advertising.csv", row.names = 1)
+print(head(Advertising, n = 8), print.gap = 3)
+@
+
+{\lolit (first 8 rows)}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Advertising Data from ISL}
+
+\textbf{Advertising} consists of:
+
+\bi
+  \item the \code{Sales} of a product in 200 different markets
+  \item the advertising budgets for three different media:
+  \bi
+    \item \code{TV}
+    \item \code{Radio}
+    \item \code{Newspaper}
+  \ei
+  \item It is not possible to directly increase the sales of the product
+  \item On the other hand, it is possible to control the advertising expenditure 
+  in each of the 3 media
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Introduction}
+
+\bbi
+  \item Suppose we observe a quantitative response $Y$ and $p$ 
+  different predictors, $X_1, X_2, \dots, X_p$
+  \item We assume there is some relationship between $Y$ and $[X_1, \dots, X_p]$.
+  that can be written in a general form as
+  $$
+  Y = f(X_1, X_2, \dots, X_p) + \epsilon
+  $$
+  \item $f$ represents the systematic information that the predictors provide about $Y$
+  \item $\epsilon$ represents an \textit{error} term that is a catch-all for what we miss with the model
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Data set \code{Advertising}}
+
+Response:
+\bi
+  \item  $Y$: \code{Sales}
+\ei 
+
+Predictors:
+\bi
+  \item $X_1$: \code{TV}
+  \item $X_2$: \code{Radio}
+  \item $X_3$: \code{Newspaper}
+\ei
+
+\bigskip
+Relationship:
+\begin{center}
+\code{Sales} = $f$(\code{TV}, \code{Radio}, \code{Newspaper}) + $\epsilon$
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Introduction}
+
+One possibility for $f()$ is a linear relationship of the form:
+{\Large
+$$
+Y = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p + \varepsilon
+$$
+}
+
+\pause
+\bi
+  \item It assumes a linear dependence of $Y$ on the predictors
+  \item $\beta_0, \beta_1, \dots, \beta_p$ are unknown constants
+  also known as the model \textit{coefficients} or \textit{parameters}
+  \item The linearity is in the parameters (i.e. coefficients)
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Linear relationship}
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p + \epsilon
+$$
+
+\bigskip
+
+\begin{center}
+\code{Sales} = $\beta_0$ + $\beta_1$ \code{TV} + $\beta_2$ \code{Radio} + $\beta_3$ \code{Newspaper} + $\epsilon$
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Examples of linear models}
+
+A couple of examples of other possible linear models
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 log(X_2) + \beta_3 X_1 X_2 + \varepsilon 
+$$
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_{1}^{2} + \beta_3 (X_{1}^{X_2}) + \varepsilon 
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Non-linear models}
+
+Some models are not linear in the parameters:
+$$
+Y = \beta_0 + \beta_1 X_{1}^{\beta_2} + \varepsilon 
+$$
+
+Some relationships can be transformed to linearity, for example:
+$$
+Y = \beta_0 X_{1}^{\beta_1} \varepsilon
+$$
+can be linearized by taking logs (and reexpressing some of the parameters)
+
+$$
+log(Y) = log(\beta_0) + \beta_1 log(X_1) + log(\varepsilon)
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Introduction}
+
+The challenge involves finding parameter estimates denoted by 
+$$
+\hat{\beta_0}, \hat{\beta_1}, \dots, \hat{\beta_p}
+$$
+that provide the ``best'' approximation for $Y$:
+
+$$
+Y \approx \hat{\beta_0} + \hat{\beta_1} X_1 + \dots + \hat{\beta_p} X_p
+$$
+
+or more commonly
+
+$$
+\hat{Y} = \hat{\beta_0} + \hat{\beta_1} X_1 + \dots + \hat{\beta_p} X_p
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Introduction}
+
+\bbi
+  \item Linearity is a BIG assumption.
+  \item True regression functions are rarely linear.
+  \item Although it may seem overly simplistic, linear regression is 
+  extremely useful both conceptually and practically.
+  \item Quoting famous statistician George Box: \\
+  \textit{``All models are worng, but some are useful.''}
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Simple Linear Regression}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Simple Linear Regression with one predictor}
+
+\bbi
+  \item Simple Linear Regression = Univariate regression
+  \item One predictor variable $X$ and one response variable $Y$
+\ei
+
+{\large
+$$
+Y = \beta_0 + \beta_1 X + \varepsilon
+$$
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Simple Linear Regression with one predictor}
+
+We assume a linear model
+
+{\large
+$$
+Y = \beta_0 + \beta_1 X + \varepsilon
+$$
+}
+
+where:
+
+\bi
+  \item $\beta_0$ and $\beta_1$ are two unknown constants also known 
+  as \textit{coefficients} or \textit{parameters}
+  \item $\beta_0$ represents the \textit{intercept}
+  \item $\beta_1$ represents the \textit{slope}
+  \item $\varepsilon$ is the error term
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Simple Linear Regression with one predictor}
+
+In vector notation:
+{\large
+$$
+\mathbf{y} = \beta_0 + \beta_1 \mathbf{x} + \boldsymbol{\varepsilon}
+$$
+}
+
+where:
+\bi
+  \item $\mathbf{y}$ is the vector representing the response variable 
+  \item $\mathbf{x}$ is the vector representing the predictor variable 
+  \item $\boldsymbol{\varepsilon}$ is the vector representing the error term
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Some vector-matrix notation}
+
+In matrix notation:
+$$
+\underset{n\times 1}{\mathbf{y}} =  \underset{n \times 2}{\mathbf{X}} \times 
+\underset{2\times 1}{\boldsymbol{\beta}} + \underset{n\times 1}{\boldsymbol{\varepsilon}}
+$$
+
+which can be represented by:
+$$
+\begin{bmatrix} 
+y_1 \\
+y_2 \\
+y_3 \\
+\vdots \\
+y_n \\
+\end{bmatrix}
+=
+\begin{bmatrix} 
+1 & x_{1} \\
+1 & x_{2} \\
+1 & x_{3} \\
+\vdots & \vdots \\
+1 & x_{n} \\
+\end{bmatrix}
+\
+\begin{bmatrix} 
+\beta_0 \\ 
+\beta_1 \\
+\end{bmatrix}
++
+\begin{bmatrix} 
+\varepsilon_1 \\
+\varepsilon_2 \\
+\varepsilon_3 \\
+\vdots \\
+\varepsilon_n \\
+\end{bmatrix}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Simple Linear Regression with one predictor}
+
+Note that if the data is centered (mean = 0)
+{\large
+$$
+\mathbf{y} = \beta_1 \mathbf{x} + \boldsymbol{\varepsilon}
+$$
+}
+
+then there is no intercept term $\beta_0$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Some vector-matrix notation}
+
+With centered data we have:
+$$
+\underset{n\times 1}{\mathbf{y}} =  \underset{n \times 1}{\mathbf{x}} \times 
+\beta_1 + \underset{n\times 1}{\boldsymbol{\varepsilon}}
+$$
+
+which can be represented by:
+$$
+\begin{bmatrix} 
+y_1 \\
+y_2 \\
+y_3 \\
+\vdots \\
+y_n \\
+\end{bmatrix}
+=
+\begin{bmatrix} 
+x_{1} \\
+x_{2} \\
+x_{3} \\
+\vdots \\
+x_{n} \\
+\end{bmatrix}
+\
+\begin{bmatrix} 
+\beta_1 \\
+\end{bmatrix}
++
+\begin{bmatrix} 
+\varepsilon_1 \\
+\varepsilon_2 \\
+\varepsilon_3 \\
+\vdots \\
+\varepsilon_n \\
+\end{bmatrix}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Various simple regressions}
+\begin{center}
+\ig[width=11cm]{images/advertising-regressions.png}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Simple Linear Regression with one predictor}
+
+Assuming the model
+
+$$
+\mathbf{y} = \beta_0 + \beta_1 \mathbf{x} + \boldsymbol{\epsilon}
+$$
+
+and given some estimates $\hat{\beta_0}$ and $\hat{\beta_1}$ for the model 
+coefficients, we predict future sales using
+
+$$
+\mathbf{\hat{y}} = \hat{\beta_0} + \hat{\beta_1} \mathbf{x}
+$$
+
+where $\mathbf{\hat{y}}$ indicates the predicted $\mathbf{y}$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Fitting a Line}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=9cm]{images/which-line1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=9cm]{images/which-line2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+{\Large How to find the ``best'' \\ fitting line?}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=11cm]{images/fit-line1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=11cm]{images/fit-line2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=11cm]{images/fit-line3.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=11cm]{images/fit-line4.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Which Criterion?}
+\begin{center}
+\ig[width=10cm]{images/which-criteria.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Fitting a Line}
+\begin{center}
+\ig[width=11cm]{images/fit-line5.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Estimation of Parameters}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters}
+
+\bi
+  \item Let $\hat{y}_i = \hat{\beta_0} + \hat{\beta_1} x_i$ be the prediction
+  for $\mathbf{y}$ based on the $i$th value of $\mathbf{x}$
+  \pause
+  \item Then $e_i = y_i - \hat{y}_i$ represents the $i$th {\hilit residual} 
+  \pause
+  \item We define the {\hilit Residual Sum of Squares} (RSS) as
+  $$
+  \text{RSS} = e_1^2 + e_2^2 + \dots + e_n^2
+  $$
+  \item The \textbf{Least Squares} approach chooses $\hat{\beta_0}$ and 
+$\hat{\beta_1}$ to minimize the RSS
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters}
+
+The starting point is to write the model as:
+$$
+\mathbf{e} = \mathbf{y} - (\beta_0 + \beta_1 \mathbf{x})
+$$
+
+For convenience we define a quadratic loss function
+$$
+L = \sum_{i=1}^{n} e_{i}^{2} = \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i)^2
+$$
+
+To minimize $L$ we take partial derivatives with respect to each of the two parameters
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters}
+
+Taking partial derivatives w.r.t each of the two parameters:
+$$
+\frac{\partial L}{\partial \beta_0} = 2 \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i) (-1) = 0
+$$
+
+and
+$$
+\frac{\partial L}{\partial \beta_1} = 2 \sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i) (-x_i) = 0
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters}
+
+The solutions for $\beta_0$ and $\beta_1$ would be ontained by solving 
+the so-called \textit{normal equations}
+$$
+\sum_{i=1}^{n} (y_i - \beta_0 - \beta_1 x_i) = 0
+$$
+
+and
+$$
+\sum_{i=1}^{n} (x_i y_i - x_i \beta_0 - \beta_1 x_{i}^{2}) = 0
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters by OLS}
+
+The \textbf{Least Squares} coefficients are:
+
+\begin{align*}
+\hat{\beta_1} &= \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n} (x_i - \bar{x})^2} \\
+\vspace{5mm} \\
+\hat{\beta_0} &= \bar{y} - \hat{\beta_1} \bar{x} 
+\end{align*}
+
+where:
+
+$$
+\bar{y} = \frac{1}{n} \sum_{i=1}^{n} y_i \quad \text{and} 
+\quad \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Estimation of the parameters by OLS}
+
+Notice that:
+$$
+\hat{\beta_1} = \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n} (x_i - \bar{x})^2}
+$$
+
+is equivalent to:
+$$
+\hat{\beta_1} = \frac{cov(\mathbf{x}, \mathbf{y})}{var(\mathbf{x})}
+$$
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Example: Advertising Data}
+
+<<>>=
+# number of observations
+n <- nrow(Advertising)
+
+# model matrix
+x <- Advertising$TV
+
+# reponse variable
+y <- Advertising$Sales
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Example: Advertising Data}
+
+<<>>=
+# slope
+b1 <- cov(x, y) / var(x)
+b1
+
+# intercept
+b0 <- mean(y) - b1 * mean(x)
+b0
+@
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Example: Advertising Data}
+\begin{center}
+\ig[width=9cm]{images/advertising-regression-tv-sales.png}
+\end{center}
+
+{\footnotesize The least squares fit for the regression of \code{Sales} on \code{TV}. \\
+In this case a linear fit captures the essence of the relationship, although 
+it is somewhat deficient in the left of the plot.}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{center}
+\Huge{\hilit{Another perspective}}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Projection}
+
+Notice that:
+$$
+\hat{\beta_1} = \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n} (x_i - \bar{x})^2}
+$$
+
+\bigskip
+Can be expressed in vector notation as:
+{\large
+$$
+\hat{\beta_1} = \frac{\mathbf{y^\mathsf{T} x}}{\mathbf{x^\mathsf{T} x}}
+$$
+}
+with $\mathbf{x}$ and $\mathbf{y}$ mean-centered.
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Projection}
+
+Thus, with centered variables $\mathbf{x}$ and $\mathbf{y}$, the fitted values 
+$\mathbf{\hat{y}}$ are given by:
+
+{\large
+\begin{align*}
+\mathbf{\hat{y}} &= \hat{\beta_1} \mathbf{x} \\
+&= \left( \frac{\mathbf{y^\mathsf{T} x}}{\mathbf{x^\mathsf{T} x}} \right) \mathbf{x} \\
+&= \mathbf{x} \left( \frac{\mathbf{y^\mathsf{T} x}}{\mathbf{x^\mathsf{T} x}} \right) \\
+&= \mathbf{x} (\mathbf{x^\mathsf{T} x})^{-1} \mathbf{x^\mathsf{T} y} 
+\end{align*}
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{From variables perspective}
+\begin{center}
+\ig[width=9cm]{images/simple-ols-geometry1.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{From variables perspective}
+\begin{center}
+\ig[width=9cm]{images/simple-ols-geometry2.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{From variables perspective}
+\begin{center}
+\ig[width=9cm]{images/simple-ols-geometry3.pdf}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Some Remarks}
+
+\bbi
+  \item There is nothing in the Least Squares method that requires statistical inference:
+formal tests of null hypotheses or confidence intervals.
+  \item In its simplest form, regression analysis can be performed without statistical inference.
+  \item The inferential part can sometimes be very useful but goes beyond the definition of a regression analysis.
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Some Comments}
+
+\bbi
+  \item Linear Regression is a ``simple'' approach to supervised learning.
+  \item Don't get fooled by the word ``simple''.
+  \item ``simple'' $\neq$ easy / boring / uninteresting.
+  \item I will use the terms \textit{Regression Analysis} and \textit{Regression Model} interchangeably.
+\ei
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Bibliography}
+
+{\footnotesize
+\bi
+  \item \textbf{Statistical Regression and Classification} by Norman Matloff (2017). CRC Press.
+  \item \textbf{Linear Models with R} by Julian Faraway (2015). CRC Press.
+  \item \textbf{Modern Regression Methods} by Thomas Ryan (2009). Wiley.
+  \item \textbf{A Modern Approach to Regression with R} by Simon Sheather (2009). Springer.
+  \item \textbf{Modern Multivariate Statistical Techniques} by Julian Izenman (2008). Springer.
+  \item \textbf{Data Mining and Statistics for Decision Making} by Stephane Tuffery (2011).
+  \textit{Chapter 11: Classification and prediction methods}. Wiley.
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{French Literature}
+
+{\footnotesize
+\bi
+  \item \textbf{Probabilites, analyse des donnees et statistique} by Gilbert Saporta (2011).
+  \textit{Chapter 17: La regression multiple et le modele lineaire general}. 
+  Editions Technip, Paris.
+  \item \textbf{Statistique: Methodes pour decrire, expliquer et prevoir} 
+  by Michel Tenenhaus (2008). \textit{Chapter 5: La Regression Multiple}. Dunod, Paris.
+  \item \textbf{Regression avec R} by Cornillon and Matzner-Lober (2011). Springer.
+  \item \textbf{Statistique Exploratoire Multidimensionnelle} by Lebart et al (2004).
+  \textit{Chapter 3, section 3.2: Regression multiple, modele lineaire}. Dunod, Paris.
+  \item \textbf{Traitement des donnees statistiques} by Lebart et al. (1982). 
+  \textit{Unit 3: Modele Lineaire}. Dunod, Paris.
+\ei
+}
+
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}
